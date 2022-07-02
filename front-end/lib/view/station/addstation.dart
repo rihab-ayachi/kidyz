@@ -59,8 +59,8 @@ class _AddStationState extends State<AddStation> {
               setState(() {
                 itms = city0.map((e) {
                   return {
-                    'value': e!.area,
-                    'label': e!.area,
+                    'value': e.area,
+                    'label': e.area,
                   };
                 }).toList();
               })
