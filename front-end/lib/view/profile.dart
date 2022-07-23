@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/model/user_login.dart';
-import 'package:flutter_application_1/service/api_profile.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_application_1/view/login.dart';
+import 'package:circle_button/circle_button.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_1/view/Publier.dart';
+import 'package:flutter_application_1/view/accueil.dart';
+import 'package:flutter_application_1/view/categories.dart';
+import 'package:flutter_application_1/view/shopping.dart';
+import 'package:flutter_switch/flutter_switch.dart';
+
+import 'package:select_form_field/select_form_field.dart';
 
 class Profile extends StatefulWidget {
   Profile({Key? key}) : super(key: key);
@@ -13,324 +17,292 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
-  bool isEditMode = false;
-  User? user;
-//class Profile extends StatelessWidget {
-  String? id;
-  String? nom;
-  String? prenom;
-  String? email;
+  PageController _pageController = PageController();
+  // List<Widget> _screens = [Categories(), Shopping(), Publier(), Profile()];
+  // int _selectIndex = 0;
+  // void _onPageChanged(int index) {
+  //   setState(() {
+  //     _selectIndex = index;
+  //   });
+  // }
 
-  bool isSignin = false;
+  // void _onItemTapped(int selectIndex) {
+  //   _pageController.jumpToPage(selectIndex);
+  // }
 
-  getToken() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    // id = sharedPreferences.getString("id");
-    //nom = sharedPreferences.getString("nom");
-    nom = sharedPreferences.getString("nom");
-    prenom = sharedPreferences.getString("prenom");
-    email = sharedPreferences.getString("email");
-
-    if (prenom != null) {
-      setState(() {
-        nom = sharedPreferences.getString("nom");
-        prenom = sharedPreferences.getString("prenom");
-        email = sharedPreferences.getString("email");
-        isSignin = true;
-      });
-    }
-  }
-
-  @override
-  initState() {
-    getToken();
-    user = User(email: '', firstName: '', id: '', lastName: '', token: '');
-
-    Future.delayed(Duration.zero, () {
-      if (ModalRoute.of(context)?.settings.arguments != null) {
-        final Map arguments = ModalRoute.of(context)?.settings.arguments as Map;
-
-        user = arguments["model"];
-        isEditMode = true;
-        setState(() {});
-      }
-    });
-    //id = SharedPref.getToken() as String;
-    // TODO: implement initState
-    //super.initState();
-  }
-
-  TextEditingController _passwordController = TextEditingController();
-  bool vis = true;
+  bool status = false;
+  bool isToggled = false;
+  List<Map<String, dynamic>> categoriesList = [];
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(4, 9, 35, 1),
-                Color.fromRGBO(39, 105, 171, 1),
-              ],
-              begin: FractionalOffset.bottomCenter,
-              end: FractionalOffset.topCenter,
-            ),
+    return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            'Profil',
+            style: TextStyle(color: Colors.black),
           ),
+          backgroundColor: Colors.pink[100],
+          toolbarHeight: 100,
         ),
-        Scaffold(
-          backgroundColor: Colors.transparent,
-          body: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 73),
-              child: Column(
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        AntDesign.arrowleft,
-                        color: Colors.white,
-                      ),
-                      Icon(
-                        AntDesign.logout,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
+                  CircleButton(
+                      onTap: () => {},
+                      tooltip: 'photo',
+                      width: 60.0,
+                      height: 60.0,
+                      borderColor: Colors.black54,
+                      borderWidth: 4.0,
+                      borderStyle: BorderStyle.solid,
+                      backgroundColor: Colors.transparent,
+                      child: Text('photo')),
                   SizedBox(
-                    height: 10,
+                    height: 1.0,
+                    width: 20,
+                  ),
+                  Icon(Icons.star_outline),
+                  Icon(Icons.star_outline),
+                  Icon(Icons.star_outline),
+                  Icon(Icons.star_outline),
+                  Text('ridashop'),
+                  SizedBox(
+                    height: 1.0,
+                    width: 20,
                   ),
                   Text(
-                    'My\nProfile',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontFamily: 'Nisebuschgardens',
-                    ),
-                  ),
-                  SizedBox(
-                    height: 22,
-                  ),
-                  Container(
-                    height: height * 0.43,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        double innerHeight = constraints.maxHeight;
-                        double innerWidth = constraints.maxWidth;
-                        return Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height: innerHeight * 0.72,
-                                width: innerWidth,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: Colors.white,
-                                ),
-                                child: Column(children: [
-                                  SizedBox(
-                                    height: 80,
-                                  ),
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Column(children: [
-                                          nom != null
-                                              ? Text(
-                                                  nom!,
-                                                  style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        39, 105, 171, 1),
-                                                    fontFamily: 'Nunito',
-                                                    fontSize: 20,
-                                                  ),
-                                                )
-                                              : Text("Loading"),
-                                        ]),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Column(children: [
-                                          prenom != null
-                                              ? Text(
-                                                  prenom!,
-                                                  style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        39, 105, 171, 1),
-                                                    fontFamily: 'Nunito',
-                                                    fontSize: 20,
-                                                  ),
-                                                )
-                                              : Text("Loading"),
-                                        ]),
-                                      ]),
-
-                                  /* Text(
-                                      'Jhone Doe',
-                                      style: TextStyle(
-                                        color: Color.fromRGBO(39, 105, 171, 1),
-                                        fontFamily: 'Nunito',
-                                        fontSize: 20,
-                                      ),
-                                    ),*/
-                                  SizedBox(
-                                    height: 5,
-                                  ),
-                                  Column(children: [
-                                    email != null
-                                        ? Text(
-                                            email!,
-                                            style: TextStyle(
-                                              color: Color.fromRGBO(
-                                                  39, 105, 171, 1),
-                                              fontFamily: 'Nunito',
-                                              fontSize: 20,
-                                            ),
-                                          )
-                                        : Text("Loading"),
-                                  ]),
-                                ]),
-                              ),
-                            ),
-                            Positioned(
-                              top: 110,
-                              right: 20,
-                              child: Icon(
-                                AntDesign.setting,
-                                color: Colors.grey[700],
-                                size: 30,
-                              ),
-                            ),
-                            Positioned(
-                              top: 0,
-                              left: 0,
-                              right: 0,
-                              child: Center(
-                                child: Container(
-                                  child: Image.asset(
-                                    'images/profile.jpg',
-                                    width: innerWidth * 0.45,
-                                    fit: BoxFit.fitWidth,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    height: height * 0.5,
-                    width: width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Column(children: [
-                          SizedBox(
-                            height: 20,
-                          ),
-                          Text(
-                            'Edit Password',
-                            style: TextStyle(
-                              color: Color.fromRGBO(39, 105, 171, 1),
-                              fontSize: 27,
-                              fontFamily: 'Nunito',
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          Container(
-                            child: TextFormField(
-                                controller: _passwordController,
-                                obscureText: vis,
-                                decoration: InputDecoration(
-                                  hintText: 'Password',
-                                  prefixIcon: Icon(
-                                    Icons.vpn_key,
-                                    color: Colors.blue,
-                                  ),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(vis
-                                        ? Icons.visibility_off
-                                        : Icons.visibility),
-                                    onPressed: () {
-                                      vis = !vis;
-                                    },
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Color.fromRGBO(39, 105, 171, 1),
-                                      )),
-                                  focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide: BorderSide(
-                                        color: Color.fromRGBO(39, 105, 171, 1),
-                                      )),
-                                  errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide:
-                                          BorderSide(color: Colors.red)),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      borderSide:
-                                          BorderSide(color: Colors.red)),
-                                )),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Container(
-                            child: RaisedButton(
-                              color: Colors.blue,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16)),
-                              onPressed: () {
-                                setState(() {
-                                  APIServiceProfile.reset(
-                                      user!.email, _passwordController.text);
-
-                                  // if (_key.currentState!.validate()) {
-                                });
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            Profile()),
-                                    (Route<dynamic> route) => false);
-                              },
-                              child: Text(
-                                "valider",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ])),
+                    '0 evaluation',
+                    textAlign: TextAlign.end,
                   )
                 ],
               ),
-            ),
+              SizedBox(
+                height: 20,
+              ),
+              ListTile(
+                  title: Text("Mes favoris", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded)),
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                  title:
+                      Text("Mes achats / ventes", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded)),
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                  title: Text("Porte monnaie", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded)),
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                  title: Text("Mes évaluation", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded)),
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                title: Center(
+                  child: Row(
+                    children: [
+                      Text("Mode invisible ", textAlign: TextAlign.center),
+                      SizedBox(
+                        width: 100,
+                      ),
+                      FlutterSwitch(
+                        disabled: true,
+                        height: 30.0,
+                        width: 50.0,
+                        padding: 4.0,
+                        toggleSize: 20.0,
+                        borderRadius: 16,
+                        activeColor: Colors.green,
+                        value: isToggled,
+                        onToggle: (value) {},
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                  title: Text("Pramétres", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded)),
+              Divider(color: Colors.black38, height: 1, thickness: 1),
+              ListTile(
+                  title: Text("Informations", textAlign: TextAlign.center),
+                  trailing: Icon(Icons.play_arrow_rounded))
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'Mes favoris',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'Mes achats/vente',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'Porte monnaie',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'Mes evaluations',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+              // SizedBox(
+              //   height: 10,
+              // ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.end,
+              //   children: [
+              //     Text('Mode invisible', textAlign: TextAlign.left),
+              //     FlutterSwitch(
+              //       height: 30.0,
+              //       width: 100.0,
+              //       padding: 4.0,
+              //       toggleSize: 20.0,
+              //       borderRadius: 10.0,
+              //       activeColor: Colors.green,
+              //       value: isToggled,
+              //       onToggle: (value) {},
+              //     ),
+              //   ],
+              // ),
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'Parametres',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+              // SelectFormField(
+              //     type: SelectFormFieldType.dropdown, // or can be dialog
+              //     initialValue: '',
+              //     labelText: 'informations',
+              //     items: categoriesList,
+              //     onChanged: (val) => {},
+              //     onSaved: (val) => {}),
+            ],
           ),
-        )
-      ],
-    );
+        ),
+        bottomNavigationBar: BottomAppBar(
+            child: Container(
+                height: 100,
+                color: Colors.indigo[400],
+                child:
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                        primary: Colors.white,
+                        textStyle: const TextStyle(fontSize: 10),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Accueil()),
+                            (Route<dynamic> route) => false);
+                      },
+                      child: Text("Accueil")),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                        primary: Colors.white,
+                        textStyle: const TextStyle(fontSize: 10),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Shopping()),
+                            (Route<dynamic> route) => false);
+                      },
+                      child: Text("Shopping")),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                        primary: Colors.white,
+                        textStyle: const TextStyle(fontSize: 10),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Publier()),
+                            (Route<dynamic> route) => false);
+                      },
+                      child: Text("Publier")),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  TextButton(
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.all(16.0),
+                        primary: Colors.pink[100],
+                        textStyle: const TextStyle(fontSize: 10),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) => Profile()),
+                            (Route<dynamic> route) => false);
+                      },
+                      child: Text("Profil")),
+
+                  //  TextButton(
+                  //   style: TextButton.styleFrom(
+                  //     padding: const EdgeInsets.all(16.0),
+                  //     primary: Colors.white,
+                  //     textStyle: const TextStyle(fontSize: 20),
+                  //   ),
+                  //   onPressed: () {},
+                  //  )
+                ])))
+        // bottomNavigationBar: BottomNavigationBar(
+        //   currentIndex: 0,
+
+        //   backgroundColor: Color.fromARGB(
+        //       255, 35, 89, 134), // this will be set when a new tab is tapped
+        //   items: [
+        //     BottomNavigationBarItem(icon: Icon(Icons.public), label: 'publier'),
+        //     BottomNavigationBarItem(
+        //       icon: new Icon(Icons.shopping_cart),
+        //       label: 'Shopping',
+        //     ),
+        //     BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profil')
+        //   ],
+        // ),
+        );
   }
 }
+// child: Container(
+          //   color: Colors.pink[100],
+          //   width: double.infinity,
+          //   height: 200,
+          //   alignment: Alignment.center,
+          //   child: Image(
+          //     image: AssetImage(
+          //       "images/logo.png",
+          //     ),
+          //     width: 180,
+          //     height: 50,
+          //   ),
+          // ),
