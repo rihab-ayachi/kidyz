@@ -44,6 +44,9 @@ dependencies:
  
   circle_button: ^1.1.0
   flutter_switch: ^0.3.2
+  shared_preferences: ^2.0.15
+  fluttertoast: ^8.0.9
+  
 
 
   

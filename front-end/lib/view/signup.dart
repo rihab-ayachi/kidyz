@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/view/notif.dart';
 
 import 'package:flutter_application_1/view/Logo.dart';
+import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
+import 'dart:convert';
 
 class Signup extends StatefulWidget {
   Signup({Key? key}) : super(key: key);
@@ -13,6 +16,48 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  Future register() async {
+    var url = Uri.parse("http://192.168.1.179/meilleavinted/signup.php");
+    var response = await http.post(url, body: {
+      "email": _emailController.text,
+      "password": _passwordController.text,
+    });
+    var data = json.decode(response.body);
+    if (data == "Error") {
+      Fluttertoast.showToast(
+        msg: 'User allready exit!',
+        textColor: Colors.red,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: 'Registration Successful',
+        textColor: Colors.green,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Notif(),
+        ),
+      );
+    }
+  }
+
+  // signup() async {
+  //   var url = Uri.parse("http://192.168.1.90/meilleavinted/signup.php");
+
+  //   var response = await http.post(url, body: {
+  //     "password": _emailController.text,
+  //     "email": _passwordController.text,
+  //   });
+  //   var data = json.decode(response.body);
+  //   print("**************$data");
+  //   if (data == "error") {
+  //     print("failed");
+  //   } else {
+  //     print("*****************success");
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,10 +97,11 @@ class _SignupState extends State<Signup> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40)),
                       onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => Notif()),
-                            (Route<dynamic> route) => false);
+                        register();
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        //     MaterialPageRoute(
+                        //         builder: (BuildContext context) => Notif()),
+                        //     (Route<dynamic> route) => false);
                       },
                       child: Text(
                         "valider",

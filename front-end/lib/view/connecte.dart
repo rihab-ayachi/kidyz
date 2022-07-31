@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/view/Accueil.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Connect extends StatefulWidget {
   Connect({Key? key}) : super(key: key);
@@ -11,6 +16,70 @@ class Connect extends StatefulWidget {
 class _ConnectState extends State<Connect> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  GlobalKey<FormState> formStatesignin = new GlobalKey<FormState>();
+  GlobalKey<FormState> formStatesignup = new GlobalKey<FormState>();
+  savePref(String username, String email, String id) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setString("id", id);
+    preferences.setString("username", username);
+    preferences.setString("email", email);
+    print(preferences.getString("username"));
+    print(preferences.getString("email"));
+    print(preferences.getString("id"));
+  }
+
+  Future login() async {
+    var url = Uri.parse("http://192.168.1.179/meilleavinted/login.php");
+    var response = await http.post(url, body: {
+      "email": _emailController.text,
+      "password": _passwordController.text,
+    });
+    var data = json.decode(response.body);
+    if (data == "Success") {
+      Fluttertoast.showToast(
+        msg: 'Login Successful',
+        textColor: Colors.green,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Accueil(),
+        ),
+      );
+    } else {
+      Fluttertoast.showToast(
+          msg: 'Username and password invalid', textColor: Colors.red);
+    }
+  }
+
+  // signin() async {
+  //   var formdata = formStatesignin.currentState;
+  //   if (formdata!.validate()) {
+  //     print("not valid");
+  //   } else {
+  //     formdata.save();
+  //     var data = {
+  //       "email": _emailController.text,
+  //       "password": _passwordController.text
+  //     };
+  //     var url = Uri.parse("http://192.168.1.90/meilleavinted/login.php");
+
+  //     var response = await http.post(url, body: data);
+  //     var responsebody = jsonDecode(response.body);
+  //     if (responsebody['status'] == "success") {
+  //       savePref(responsebody['username'], responsebody['email'],
+  //           responsebody['id']);
+  //       Navigator.of(context).pushNamed("Accueil");
+  //     } else {
+  //       print("login faild");
+  //       if (Navigator.of(context).canPop()) {
+  //         Navigator.of(context).pop();
+  //       }
+  //     }
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,10 +123,11 @@ class _ConnectState extends State<Connect> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(40)),
                       onPressed: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (BuildContext context) => Accueil()),
-                            (Route<dynamic> route) => false);
+                        login();
+                        // Navigator.of(context).pushAndRemoveUntil(
+                        //     MaterialPageRoute(
+                        //         builder: (BuildContext context) => Accueil()),
+                        //     (Route<dynamic> route) => false);
                       },
                       child: Text(
                         "se connecter",
@@ -104,10 +174,13 @@ class _ConnectState extends State<Connect> {
               borderRadius: BorderRadius.circular(50)),
           child: TextFormField(
               textAlign: TextAlign.center,
-              controller: _passwordController,
+              controller: _emailController,
               decoration: InputDecoration(
                 hintText: 'email',
                 enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide(color: Color(0xFFF5F5F5))),
+                focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: BorderSide(color: Color(0xFFF5F5F5))),
               )),
@@ -127,6 +200,10 @@ class _ConnectState extends State<Connect> {
               decoration: InputDecoration(
                 hintText: 'mot de passe',
                 enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  borderSide: BorderSide(color: Color(0xFFF5F5F5)),
+                ),
+                focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(50),
                     borderSide: BorderSide(color: Color(0xFFF5F5F5))),
               )),
